@@ -37,33 +37,13 @@ public class Calculator {
 
 			// searching for the operator
 			ConstantEnum constant = ConstantEnum.getEnum(str);
-
-			// Clear up every thing -> next input
-			if(constant == ConstantEnum.CLEAR) {
-				valuesStack.clear();
-				orderStack.clear();
-				return;
-			}
-
-			// undo calculation the last instruction
-			if (constant == ConstantEnum.UNDO) {
-				if (orderStack.isEmpty()) {
-					throw new Exception("no operations to undo");
-				}
-
-				Order lastOrder = orderStack.pop();
-				if (lastOrder == null) {
-					valuesStack.pop();
-				} else {
-					calucate(lastOrder.getReverseInstruction(), true); //TODO
-				}
-				return;
-			}
-
-			// Check the operation param 
-			if (constant.getOrderNum() > valuesStack.size()) {
-				throw new Exception(String.format("operator %s (position: %d): insufficient parameters", str, currentIndex));
-			}
+			
+			// undo action
+			this.undo(constant);
+			// clear action
+			this.clear(constant);
+			// check the operation number is suff or not
+			this.checkOp(constant, str);
 
 			// Start to calculate
 			Double firstOperand = valuesStack.pop();
@@ -79,7 +59,6 @@ public class Calculator {
 			}
 
 		} else {
-			// it's a digit
 			valuesStack.push(Double.parseDouble(str));
 			if (!isUndo) {
 				orderStack.push(null);
@@ -96,4 +75,37 @@ public class Calculator {
 			
 		}
 	}
+	private void undo(ConstantEnum constant) {
+		// Clear up every thing -> next input
+		if(constant == ConstantEnum.CLEAR) {
+			valuesStack.clear();
+			orderStack.clear();
+			return;
+		}
+		
+	}
+	
+	private void clear(ConstantEnum constant) throws Exception {
+		// undo calculation the last instruction
+		if (constant == ConstantEnum.UNDO) {
+			if (orderStack.isEmpty()) {
+				throw new Exception("no operations to undo");
+			}
+
+			Order lastOrder = orderStack.pop();
+			if (lastOrder == null) {
+				valuesStack.pop();
+			} else {
+				calucate(lastOrder.getReverseInstruction(), true); //TODO
+			}
+			return;
+		}
+	}
+	private void checkOp(ConstantEnum constant, String str) throws Exception{
+		// Check the operation param 
+		if (constant.getOrderNum() > valuesStack.size()) {
+			throw new Exception(String.format("operator %s (position: %d): insufficient parameters", str, currentIndex));
+		}
+	}
+	
 }
