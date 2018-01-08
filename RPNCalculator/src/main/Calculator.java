@@ -26,24 +26,52 @@ public class Calculator {
 
 	private void process(String str, boolean isUndo) throws Exception {
 		
-		Double value = tryParseDouble(str);
+		Double value = this.tryParseDouble(str);
 		
 		if (value == null) {
 
-			// check if there is an empty stack
-			if (valuesStack.isEmpty()) {
-				throw new Exception("Empty Stack");
-			}
+
 
 			// searching for the operator
 			ConstantEnum constant = ConstantEnum.getEnum(str);
+			if(constant == null) {
+				throw new Exception("Not Valid Param");
+			}
 			
+			// check if there is an empty stack
+			if (ConstantEnum.CLEAR.getConstant().equals(constant.getConstant()) && valuesStack.isEmpty()) {
+//				throw new Exception("Empty Stack");
+				return;
+			}
 			// undo action
-			this.undo(constant);
+//			this.clear(constant);
+			if(constant == ConstantEnum.CLEAR) {
+				valuesStack.clear();
+				orderStack.clear();
+				return;
+			}
 			// clear action
-			this.clear(constant);
+//			this.undo(constant);
+			// undo calculation the last instruction
+			if (constant == ConstantEnum.UNDO) {
+				if (orderStack.isEmpty()) {
+					throw new Exception("no operations to undo");
+				}
+
+				Order lastOrder = orderStack.pop();
+				if (lastOrder == null) {
+					valuesStack.pop();
+				} else {
+					calucate(lastOrder.getReverseInstruction(), true); //TODO
+				}
+				return;
+			}
 			// check the operation number is suff or not
-			this.checkOp(constant, str);
+//			this.checkOp(constant, str);
+			// Check the operation param 
+			if (constant.getOrderNum() > valuesStack.size()) {
+				throw new Exception(String.format("operator %s (position: %d): insufficient parameters", str, currentIndex));
+			}
 
 			// Start to calculate
 			Double firstOperand = valuesStack.pop();
@@ -75,37 +103,36 @@ public class Calculator {
 			
 		}
 	}
-	private void undo(ConstantEnum constant) {
+	private void clear(ConstantEnum constant) {
 		// Clear up every thing -> next input
-		if(constant == ConstantEnum.CLEAR) {
-			valuesStack.clear();
-			orderStack.clear();
-			return;
-		}
-		
+//		if(constant == ConstantEnum.CLEAR) {
+//			valuesStack.clear();
+//			orderStack.clear();
+//			return;
+//		}
 	}
 	
-	private void clear(ConstantEnum constant) throws Exception {
-		// undo calculation the last instruction
-		if (constant == ConstantEnum.UNDO) {
-			if (orderStack.isEmpty()) {
-				throw new Exception("no operations to undo");
-			}
-
-			Order lastOrder = orderStack.pop();
-			if (lastOrder == null) {
-				valuesStack.pop();
-			} else {
-				calucate(lastOrder.getReverseInstruction(), true); //TODO
-			}
-			return;
-		}
+	private void undo(ConstantEnum constant) throws Exception {
+//		// undo calculation the last instruction
+//		if (constant == ConstantEnum.UNDO) {
+//			if (orderStack.isEmpty()) {
+//				throw new Exception("no operations to undo");
+//			}
+//
+//			Order lastOrder = orderStack.pop();
+//			if (lastOrder == null) {
+//				valuesStack.pop();
+//			} else {
+//				calucate(lastOrder.getReverseInstruction(), true); //TODO
+//			}
+//			return;
+//		}
 	}
 	private void checkOp(ConstantEnum constant, String str) throws Exception{
 		// Check the operation param 
-		if (constant.getOrderNum() > valuesStack.size()) {
-			throw new Exception(String.format("operator %s (position: %d): insufficient parameters", str, currentIndex));
-		}
+//		if (constant.getOrderNum() > valuesStack.size()) {
+//			throw new Exception(String.format("operator %s (position: %d): insufficient parameters", str, currentIndex));
+//		}
 	}
 	
 }

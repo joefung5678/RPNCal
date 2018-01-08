@@ -19,7 +19,7 @@ public class ValidatorImp implements ValidatorInterface{
 				// not numeric 
 				// maybe math operator
 				if(!validator.isMathOperator(str) && !validator.checkWithEnum(str, ConstantEnum.values())) {
-					throw new Exception (" Not Valid");
+					throw new Exception ("Not Valid");
 				}
 			}
 
